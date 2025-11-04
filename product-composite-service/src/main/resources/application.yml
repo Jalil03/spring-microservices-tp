@@ -1,0 +1,63 @@
+server:
+  port: 8020
+
+spring:
+  application:
+    name: product-composite-service
+
+  datasource:
+    url: jdbc:h2:mem:compdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# --- Configuration du client Eureka ---
+eureka:
+  instance:
+    prefer-ip-address: true          # Utilise l'adresse IP
+    hostname: localhost
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+# --- Tracing avec Zipkin ---
+management:
+  tracing:
+    sampling:
+      probability: 1.0  # 100% des requêtes sont envoyées à Zipkin
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+
+# --- Configuration du disjoncteur Resilience4J ---
+resilience4j:
+  circuitbreaker:
+    instances:
+      productCompositeCB:
+        registerHealthIndicator: true
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        recordExceptions:
+          - feign.FeignException
+          - feign.RetryableException
+          - java.net.ConnectException
+          - java.net.SocketTimeoutException
+        ignoreExceptions:
+          - org.springframework.web.client.HttpClientErrorException
+
+feign:
+  circuitbreaker:
+    enabled: true

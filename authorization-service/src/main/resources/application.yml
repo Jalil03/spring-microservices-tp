@@ -1,0 +1,38 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: AUTHORIZATION-SERVICE
+
+
+eureka:
+  instance:
+    prefer-ip-address: true       # ✅ Utilise 127.0.0.1 au lieu du nom machine
+    hostname: localhost           # ✅ Force "localhost" comme nom
+    instance-id: ${spring.application.name}:${server.port}
+
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+security:
+  productcomposite:
+    admin:
+      username: admin
+      password: 1234
+    user:
+      username: user
+      password: 0000
+
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0   # 100% des requêtes sont tracées
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+# Activer les endpoints pour voir les traces localement
+management.endpoints.web.exposure.include: health,info,prometheus

@@ -1,0 +1,65 @@
+server:
+  port: 8060
+
+spring:
+  application:
+    name: API-GATEWAY02
+
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+
+
+      routes:
+        - id: authorization-service
+          uri: lb://authorization-service
+          predicates:
+            - Path=/auth/**
+
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/product/**
+
+        - id: review
+          uri: lb://review-service
+          predicates:
+            - Path=/reviews/**
+
+        - id: recommendation
+          uri: lb://recommendation-service
+          predicates:
+            - Path=/recommendation/**
+
+        - id: product-composite
+          uri: lb://product-composite-service
+          predicates:
+            - Path=/product-composite/**
+
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+    instance-id: ${spring.application.name}:${server.port}
+
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0   # 100% des requêtes sont tracées
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+# Activer les endpoints pour voir les traces localement
+management.endpoints.web.exposure.include: health,info,prometheus

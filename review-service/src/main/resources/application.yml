@@ -1,0 +1,46 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: REVIEW-SERVICE
+
+  datasource:
+    url: jdbc:h2:mem:review-db
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    defer-datasource-initialization: true   # ✅ pour exécuter data.sql après création du schéma
+
+  sql:
+    init:
+      mode: always                          # ✅ force exécution de data.sql à chaque démarrage
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+management.endpoints.web.exposure.include: health,info,prometheus

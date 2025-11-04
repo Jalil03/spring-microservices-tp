@@ -1,0 +1,20 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: CONFIG-SERVER
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/Jalil03/tp-note
+          default-label: main
+          clone-on-start: true
+          skip-ssl-validation: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

@@ -1,0 +1,9 @@
+server:
+  port: 8099
+
+api:
+  base-url: http://localhost:8060/product-composite
+  auth:
+    username: admin
+    password: 1234
+    role: ADMIN

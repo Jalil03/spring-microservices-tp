@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="authorization-service" />
+        <module name="discovery-server" />
+        <module name="config-server02" />
+        <module name="api-gateway02" />
+        <module name="review-service" />
+      </profile>
+      <profile name="Annotation profile for recommendation-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
+        </processorPath>
+        <module name="rest-client-app" />
+        <module name="recommendation-service" />
+      </profile>
+      <profile name="Annotation profile for product-composite-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar" />
+        </processorPath>
+        <module name="product-service" />
+        <module name="product-composite-service" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gateway02" options="-parameters" />
+      <module name="authorization-service" options="-parameters" />
+      <module name="config-server02" options="-parameters" />
+      <module name="discovery-server" options="-parameters" />
+      <module name="product-composite-service" options="-parameters" />
+      <module name="product-service" options="-parameters" />
+      <module name="recommendation-service" options="-parameters" />
+      <module name="rest-client-app" options="-parameters" />
+      <module name="review-service" options="-parameters" />
+    </option>
+  </component>
+</project>

@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: API-GATEWAY02     # ⚠️ change le nom selon le microservice
+  config:
+    import: optional:configserver:http://localhost:8888

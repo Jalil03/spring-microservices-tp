@@ -1,0 +1,19 @@
+server:
+  port: 8761
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0   # 100% des requêtes sont tracées
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+# Activer les endpoints pour voir les traces localement
+management.endpoints.web.exposure.include: health,info,prometheus
