@@ -1,96 +1,81 @@
-# 🧩 Spring Cloud Microservices – TP Complet  
+# 🧩 Spring Cloud Microservices – TP Complet
 
-## 🏗️ Architecture Globale  
+## 🏗️ Architecture globale
 
-Ce projet met en œuvre une architecture microservices complète avec **Spring Cloud**, incluant :  
+Ce projet met en œuvre une architecture microservices complète avec **Spring Cloud** :
+- **Discovery Server (Eureka)** pour la découverte des services
+- **API Gateway** pour le routage centralisé
+- **Config Server** pour la centralisation des configurations
+- **Product-Service**, **Review-Service**, **Recommendation-Service** (services métiers)
+- **Product-Composite-Service** (orchestrateur/agrégateur)
+- **Authorization-Service** (authentification simple)
+- **Rest-Client-App** (client Java pour tester les appels)
 
-- **Eureka Server** – Découverte de services  
-- **API Gateway** – Routage centralisé  
-- **Config Server** – Centralisation des configurations  
-- **Product-Service**, **Review-Service**, **Recommendation-Service** – Services métiers  
-- **Product-Composite-Service** – Service d’agrégation (orchestrateur)  
-- **Authorization-Service** – Authentification simple  
-- **Rest-Client-App** – Application cliente REST pour tester les appels  
-
-### 📘 Schéma global de l’architecture  
-
+Schéma d’ensemble :  
 ![Architecture générale](images/1.jpg)
 
 ---
 
-## ⚙️ Découverte des services avec Eureka  
+## ⚙️ Découverte des services (Eureka)
 
-Tous les microservices s’enregistrent automatiquement auprès du **Discovery Server** :  
-
+Tous les microservices s’enregistrent automatiquement auprès du **Discovery Server**.  
+Tableau des instances enregistrées :  
 ![Eureka dashboard](images/2.jpg)
 
-> Chaque service affiche son nom, son port et son statut `UP`.  
+> Chaque service affiche son **nom**, son **port** et son **statut** `UP`.
 
 ---
 
-## 🚀 Tests via Postman  
+## 🚀 Tests API via Postman (via API Gateway)
 
-### ➕ Création d’un produit (POST)  
-![POST - création produit](images/3.jpg)  
+### 1) ➕ Création d’un produit (POST)
+![POST - création produit](images/3.jpg)
+Réponse attendue : `✅ Produit créé avec succès !`
 
-**Résultat attendu :**
-```json
-✅ Produit créé avec succès !
-```
+### 2) ✏️ Mise à jour d’un produit (PUT) – cas nominal
+![PUT - mise à jour OK](images/4.jpg)
+Réponse : `✅ Produit mis à jour avec succès !`
 
----
+### 3) ❌ Mise à jour d’un produit (PUT) – validation KO (>100)
+![PUT - erreur de validation](images/5.jpg)
+Message : `Le poids du produit ne doit pas dépasser 100 !`
 
-### ✏️ Mise à jour d’un produit (PUT)  
-![PUT - mise à jour](images/4.jpg)  
-
-**Résultat :**
-```json
-✅ Produit mis à jour avec succès !
-```
-
-⚠️ Si le poids dépasse 100, une erreur de validation est renvoyée :  
-![Erreur poids > 100](images/5.jpg)
+### 4) 🔍 Lecture d’un produit (GET) – agrégation
+![GET - récupération agrégée](images/6.jpg)
+Le **Product-Composite-Service** agrège les réponses de :
+- `Product-Service`
+- `Review-Service`
+- `Recommendation-Service`
 
 ---
 
-### 🔍 Lecture d’un produit (GET)  
-![GET - récupération](images/6.jpg)  
+## 📊 Monitoring & Metrics (Actuator)
 
-Le **ProductCompositeService** agrège les données provenant de :  
-- Product-Service  
-- Review-Service  
-- Recommendation-Service  
+La couche d’observabilité est exposée via **Spring Boot Actuator**.
 
----
+- Liste des métriques disponibles :  
+  ![Actuator metrics](images/7.jpg)
 
-## 📊 Monitoring et Metrics  
+- Nombre de requêtes **GET** traitées par le composite :  
+  ![Metrics GET count](images/8.jpg)
 
-Le service composite expose des métriques via **Spring Boot Actuator**.  
-
-### 🔹 Toutes les métriques disponibles  
-![Actuator metrics](images/7.jpg)  
-
-### 🔹 Nombre de requêtes GET  
-![Metrics GET count](images/8.jpg)  
-
-### 🔹 Nombre de requêtes POST/PUT  
-![Metrics POST/PUT count](images/9.jpg)  
+- Nombre de requêtes **POST/PUT** traitées par le composite :  
+  ![Metrics POST/PUT count](images/9.jpg)
 
 ---
 
-## 🔎 Traces distribuées avec Zipkin  
+## 🔎 Traces distribuées (Zipkin)
 
-Exemple de traçage pour le service `authorization-service` :  
-![Zipkin traces](images/10.jpg)  
+Exemple de traces pour `authorization-service` :  
+![Zipkin traces](images/10.jpg)
 
-> Chaque requête HTTP est suivie avec sa durée d’exécution et ses spans.  
+> Chaque requête affiche sa **durée** et ses **spans**, ce qui facilite le diagnostic bout‑en‑bout.
 
 ---
 
-## 🧠 Exemples de logs d’exécution  
+## 🧠 Extraits de logs
 
-### 📦 Agrégation complète d’un produit  
-
+### Agrégation complète
 ```
 🎯 Requête reçue sur ProductCompositeController (port=9084) pour productId=4
 ➡ Début de l’agrégation pour productId=4
@@ -104,26 +89,18 @@ Exemple de traçage pour le service `authorization-service` :
 ✅ Réponse envoyée avec les infos des instances pour productId=4
 ```
 
----
-
-### ⚠️ Cas d’erreur sur mise à jour  
-
+### Cas d’erreurs côté composite
 ```
 ✏ Requête PUT reçue pour mise à jour du produit id=4 avec poids=-10
-✏ Mise à jour du produit id=4 (nouveau poids=-10)
-✏ [Integration] Mise à jour du produit id=4 (poids=-10)
 ❌ Erreur lors de la mise à jour du produit composite : [400] during [PUT] to [http://PRODUCT-SERVICE/product/4]
 ✏ Requête PUT reçue pour mise à jour du produit id=4 avec poids=120
 ❌ Poids invalide (120) - doit être <= 100
 ```
 
----
-
-### 🧾 Logs du client REST  
-
+### Logs du client REST
 ```
 ➡ Envoi d'une requête GET vers http://localhost:8060/product-composite/1
-✅ Réponse GET : {product={productId=1, name=Road Sign Detector, weight=500}, ...}
+✅ Réponse GET : {...}
 ➡ Envoi d'une requête POST vers http://localhost:8060/product-composite
 ✅ Réponse POST : ✅ Produit créé avec succès !
 ➡ Envoi d'une requête PUT vers http://localhost:8060/product-composite/99
@@ -132,33 +109,40 @@ Exemple de traçage pour le service `authorization-service` :
 
 ---
 
-## 🧰 Technologies utilisées  
+## 🧰 Stack & Outils
 
-| Composant | Description |
-|------------|-------------|
-| **Spring Boot** | Framework principal |
-| **Spring Cloud** | Eureka, Config Server, Gateway, Feign |
-| **Lombok** | Réduction du code boilerplate |
-| **Actuator & Micrometer** | Monitoring |
+| Composant | Rôle |
+|---|---|
+| **Spring Boot** | Framework d’application |
+| **Spring Cloud** | Eureka, Config Server, Gateway, OpenFeign |
+| **Micrometer & Actuator** | Observabilité / métriques |
 | **Zipkin** | Traçabilité distribuée |
+| **H2** | Base en mémoire |
+| **Maven** | Build & dépendances |
 | **Postman** | Tests API |
-| **H2 Database** | Base de données en mémoire |
-| **Maven** | Gestionnaire de dépendances |
-| **IntelliJ IDEA** | IDE de développement |
+| **IntelliJ IDEA** | IDE |
 
 ---
 
-## ✅ Conclusion  
+## 🔗 Références & sources
 
-Ce TP illustre :  
-- L’orchestration d’une architecture **microservices complète**  
-- La **résilience** via Eureka & LoadBalancer  
-- Le **monitoring** avec Actuator et Micrometer  
-- Le **traçage distribué** avec Zipkin  
-- La **validation** des requêtes et la gestion des erreurs dans le Composite Service  
-- L’intégration d’un **client REST automatisé**  
+- Code de ce TP : **ce dépôt** (branche `main`).  
+- Nous nous sommes également appuyés sur des éléments provenant/issus de ce repo d’entraînement :  
+  👉 https://github.com/Jalil03/tp-note
+
+> Les captures d’écran utilisées dans ce README se trouvent dans le dossier `images/` de ce dépôt.
 
 ---
 
-✳️ *Auteur : Abdeljalil (JL)*  
+## ✅ Conclusion
+
+Ce TP démontre :
+- Une architecture **microservices** complète et **observables** (metrics + traces)
+- L’**agrégation** au niveau du composite via **OpenFeign** + **LoadBalancer**
+- La **validation** et la **gestion d’erreurs**
+- Des **tests automatisés** côté client (Rest‑Client‑App)
+
+---
+
+✳️ *Auteur : Abdeljalil BOUZINE*  
 📅 *Dernière mise à jour : 04/11/2025*
