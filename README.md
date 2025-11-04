@@ -14,7 +14,7 @@ Ce projet met en œuvre une architecture microservices complète avec **Spring C
 
 ### 📘 Schéma global de l’architecture  
 
-![Architecture générale](1.jpg)
+![Architecture générale](images/1.jpg)
 
 ---
 
@@ -22,7 +22,7 @@ Ce projet met en œuvre une architecture microservices complète avec **Spring C
 
 Tous les microservices s’enregistrent automatiquement auprès du **Discovery Server** :  
 
-![Eureka dashboard](2.jpg)
+![Eureka dashboard](images/2.jpg)
 
 > Chaque service affiche son nom, son port et son statut `UP`.  
 
@@ -31,7 +31,7 @@ Tous les microservices s’enregistrent automatiquement auprès du **Discovery S
 ## 🚀 Tests via Postman  
 
 ### ➕ Création d’un produit (POST)  
-![POST - création produit](3.jpg)  
+![POST - création produit](images/3.jpg)  
 
 **Résultat attendu :**
 ```json
@@ -41,7 +41,7 @@ Tous les microservices s’enregistrent automatiquement auprès du **Discovery S
 ---
 
 ### ✏️ Mise à jour d’un produit (PUT)  
-![PUT - mise à jour](4.jpg)  
+![PUT - mise à jour](images/4.jpg)  
 
 **Résultat :**
 ```json
@@ -49,12 +49,12 @@ Tous les microservices s’enregistrent automatiquement auprès du **Discovery S
 ```
 
 ⚠️ Si le poids dépasse 100, une erreur de validation est renvoyée :  
-![Erreur poids > 100](5.jpg)
+![Erreur poids > 100](images/5.jpg)
 
 ---
 
 ### 🔍 Lecture d’un produit (GET)  
-![GET - récupération](6.jpg)  
+![GET - récupération](images/6.jpg)  
 
 Le **ProductCompositeService** agrège les données provenant de :  
 - Product-Service  
@@ -68,20 +68,20 @@ Le **ProductCompositeService** agrège les données provenant de :
 Le service composite expose des métriques via **Spring Boot Actuator**.  
 
 ### 🔹 Toutes les métriques disponibles  
-![Actuator metrics](7.jpg)  
+![Actuator metrics](images/7.jpg)  
 
 ### 🔹 Nombre de requêtes GET  
-![Metrics GET count](8.jpg)  
+![Metrics GET count](images/8.jpg)  
 
 ### 🔹 Nombre de requêtes POST/PUT  
-![Metrics POST/PUT count](9.jpg)  
+![Metrics POST/PUT count](images/9.jpg)  
 
 ---
 
 ## 🔎 Traces distribuées avec Zipkin  
 
 Exemple de traçage pour le service `authorization-service` :  
-![Zipkin traces](10.jpg)  
+![Zipkin traces](images/10.jpg)  
 
 > Chaque requête HTTP est suivie avec sa durée d’exécution et ses spans.  
 
