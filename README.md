@@ -226,5 +226,5 @@ Ce TP démontre :
 
 ---
 
-✳️ *Auteur : Abdeljalil (JL)*  
+✳️ *Auteur : Abdeljalil BOUZINE*  
 📅 *Dernière mise à jour : 04/11/2025*
