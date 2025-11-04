@@ -11,8 +11,6 @@ Ce projet met en œuvre une architecture microservices complète avec **Spring C
 - **Authorization-Service** (authentification simple)
 - **Rest-Client-App** (client Java pour tester les appels)
 
-Schéma d’ensemble :  
-![Architecture générale](images/1.jpg)
 
 ---
 
@@ -20,7 +18,7 @@ Schéma d’ensemble :
 
 Tous les microservices s’enregistrent automatiquement auprès du **Discovery Server**.  
 Tableau des instances enregistrées :  
-![Eureka dashboard](images/2.jpg)
+![Eureka dashboard](images/1.jpg)
 
 > Chaque service affiche son **nom**, son **port** et son **statut** `UP`.
 
@@ -41,7 +39,7 @@ Réponse : `✅ Produit mis à jour avec succès !`
 Message : `Le poids du produit ne doit pas dépasser 100 !`
 
 ### 4) 🔍 Lecture d’un produit (GET) – agrégation
-![GET - récupération agrégée](images/6.jpg)
+![GET - récupération agrégée](images/2.jpg)
 Le **Product-Composite-Service** agrège les réponses de :
 - `Product-Service`
 - `Review-Service`
@@ -54,20 +52,20 @@ Le **Product-Composite-Service** agrège les réponses de :
 La couche d’observabilité est exposée via **Spring Boot Actuator**.
 
 - Liste des métriques disponibles :  
-  ![Actuator metrics](images/7.jpg)
+  ![Actuator metrics](images/6.jpg)
 
 - Nombre de requêtes **GET** traitées par le composite :  
-  ![Metrics GET count](images/8.jpg)
+  ![Metrics GET count](images/7.jpg)
 
 - Nombre de requêtes **POST/PUT** traitées par le composite :  
-  ![Metrics POST/PUT count](images/9.jpg)
+  ![Metrics POST/PUT count](images/8.jpg)
 
 ---
 
 ## 🔎 Traces distribuées (Zipkin)
 
 Exemple de traces pour `authorization-service` :  
-![Zipkin traces](images/10.jpg)
+![Zipkin traces](images/9.jpg)
 
 > Chaque requête affiche sa **durée** et ses **spans**, ce qui facilite le diagnostic bout‑en‑bout.
 
@@ -109,6 +107,90 @@ Exemple de traces pour `authorization-service` :
 
 ---
 
+🧠 Rest-Client-App – Test automatique des appels REST
+
+L’application Rest-Client-App automatise les tests d’intégration du TP à l’aide d’un client Spring Boot configuré avec RestTemplate :
+
+(images/10.jpg)
+
+Elle envoie successivement des requêtes GET, POST, et PUT vers Product-Composite-Service,
+puis affiche dans la console les réponses agrégées provenant des différents microservices.
+
+
+
+## 🧩 Centralisation des configurations avec Spring Cloud Config
+
+
+L’objectif est de mettre en place un **serveur de configuration centralisé** afin que chaque microservice récupère automatiquement ses paramètres (`application.yml`, `ports`, `Eureka URL`, etc.) depuis un **dépôt Git distant** au lieu de les définir localement.
+
+---
+
+### ⚙️ Mise en œuvre – Config Server
+
+Le **Config Server** est configuré dans le service `config-server02`.
+Il se connecte directement au dépôt GitHub suivant :  
+🔗 [https://github.com/Jalil03/tp-note](https://github.com/Jalil03/tp-note)
+
+Ce dépôt contient tous les fichiers YAML nécessaires à la configuration des microservices :
+
+| Fichier | Rôle |
+|----------|------|
+| `api-gateway.yml` | Configuration du routage vers les microservices |
+| `authorization-service.yml` | Gestion de l’authentification simple |
+| `product-service.yml` | Paramètres du service produit |
+| `review-service.yml` | Paramètres du service d’avis |
+| `recommendation-service.yml` | Paramètres du service de recommandations |
+| `product-composite-service.yml` | Service d’agrégation, avec `instance-id`, ports, etc. |
+
+Chaque microservice est donc configuré de manière **centralisée** et **versionnée** sur GitHub.
+
+---
+
+### 📘 Exemple de configuration – `application.yml` du Config Server
+![Config Server – application.yml](images/11.jpg)
+
+Dans cet exemple :
+```yaml
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/Jalil03/tp-note
+          default-label: main
+          clone-on-start: true
+          skip-ssl-validation: true
+```
+
+➡️ Cela indique au serveur de config de charger tous les fichiers YAML depuis la branche `main` du dépôt GitHub **tp-note**.
+Ainsi, dès le démarrage, le Config Server rend les fichiers disponibles via :
+
+```
+http://localhost:8888/{application-name}/{profile}
+```
+
+Exemples :
+- `http://localhost:8888/product-service/default`
+- `http://localhost:8888/review-service/default`
+
+---
+
+### 🧠 Avantages obtenus
+
+✅ **Centralisation totale** des paramètres — plus besoin de modifier chaque service manuellement.  
+✅ **Versioning Git** — toute modification du YAML est historisée sur GitHub.  
+✅ **Flexibilité** — les changements sont propagés automatiquement aux microservices.  
+✅ **Cohérence** — les environnements (dev, test, prod) partagent la même base de configuration.
+
+---
+
+### 💡 Démonstration visuelle
+
+Et voici le **fichier `application.yml`** du **Config Server**, connecté à ce dépôt :  
+![Config Server – configuration Spring Cloud](images/11.jpg)
+
+
+
 ## 🧰 Stack & Outils
 
 | Composant | Rôle |
@@ -144,5 +226,5 @@ Ce TP démontre :
 
 ---
 
-✳️ *Auteur : Abdeljalil BOUZINE*  
+✳️ *Auteur : Abdeljalil (JL)*  
 📅 *Dernière mise à jour : 04/11/2025*
